@@ -1,31 +1,19 @@
-// create web server
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const port = 3000;
+// Create web server and listen to port 3000
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
 
-const server = http.createServer((req, res) => {
-    if (req.url === '/') {
-        fs.readFile(path.join(__dirname, 'comments.html'), (err, data) => {
-            if (err) {
-                throw err;
-            }
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.write(data);
-            res.end();
-        });
-    } else if (req.url === '/comments') {
-        fs.readFile(path.join(__dirname, 'comments.json'), (err, data) => {
-            if (err) {
-                throw err;
-            }
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.write(data);
-            res.end();
-        });
+http.createServer(function (req, res) {
+  var q = url.parse(req.url, true);
+  var filename = "." + q.pathname;
+  fs.readFile(filename, function(err, data) {
+    if (err) {
+      res.writeHead(404, {'Content-Type': 'text/html'});
+      return res.end("404 Not Found");
     }
-});
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write(data);
+    return res.end();
+  });
+}).listen(3000);
 
-server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
